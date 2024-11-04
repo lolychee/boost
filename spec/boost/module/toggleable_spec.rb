@@ -2,102 +2,85 @@
 
 RSpec.describe Boost::Module::Toggleable do
   describe "when extended by a Module" do
-    subject { |mod = described_class| Module.new { extend mod } }
+    subject(:mod) { |m = described_class| Module.new { extend m } }
 
     it { is_expected.to respond_to(:on!) }
     it { is_expected.to respond_to(:on?) }
     it { is_expected.to respond_to(:off!) }
     it { is_expected.to respond_to(:off?) }
 
-    it "works with clone" do
-      subject.on!
-      clone = subject.clone
-      expect(clone.on?).to eq(true)
-    end
+    describe "#off!" do
+      before { mod.off! }
 
-    it "works with dup" do
-      subject.on!
-      clone = subject.dup
-      expect(clone.on?).to eq(true)
-    end
+      it "works with clone" do
+        expect(mod.clone.on?).to eq(false)
+      end
 
-    it do
-      module M
-        extend Boost::Module::Toggleable
+      it "works with dup" do
+        expect(mod.dup.on?).to eq(false)
+      end
 
-        def hello
-          binding.boost do
-            :hello
-          end
+      it "raises NoMethodError if no super method is defined" do
+        module M
+          extend Boost::Module::Toggleable
+
+          def hello = binding.boost { :hello }
         end
-      end
 
-      class C
-        include M
-      end
-      c = C.new
+        klass = Class.new { include M }
+        c = klass.new
 
-      expect(c.hello).to eq(:hello)
-      M.off!
-      expect { c.hello }.to raise_error(NoMethodError)
-      Object.send(:remove_const, :M)
-      Object.send(:remove_const, :C)
+        expect(c.hello).to eq(:hello)
+        M.off!
+        expect { c.hello }.to raise_error(NoMethodError)
+        Object.send(:remove_const, :M)
+      end
     end
   end
 
   describe "when extended by a Class" do
-    subject { |mod = described_class| Class.new { extend mod } }
+    subject(:klass) { |mod = described_class| Class.new { extend mod } }
 
     it { is_expected.to respond_to(:on!) }
     it { is_expected.to respond_to(:on?) }
     it { is_expected.to respond_to(:off!) }
     it { is_expected.to respond_to(:off?) }
 
-    it "works with clone" do
-      subject.on!
-      clone = subject.clone
-      expect(clone.on?).to eq(true)
-    end
+    describe "#off!" do
+      before { klass.off! }
 
-    it "works with dup" do
-      subject.on!
-      clone = subject.dup
-      expect(clone.on?).to eq(true)
-    end
-
-    it "works with subclass" do
-      subject.on!
-      subclass = Class.new(subject)
-      expect(subclass.on?).to eq(true)
-    end
-
-    it do
-      class C
-        extend Boost::Module::Toggleable
-
-        def hello
-          binding.boost do
-            :hello
-          end
-        end
+      it "works with clone" do
+        expect(klass.clone.on?).to eq(false)
       end
-      c = C.new
 
-      expect(c.hello).to eq(:hello)
-      C.off!
-      expect { c.hello }.to raise_error(NoMethodError)
-      Object.send(:remove_const, :C)
+      it "works with dup" do
+        expect(klass.dup.on?).to eq(false)
+      end
+
+      it "works with subclass" do
+        expect(Class.new(klass).on?).to eq(true)
+      end
+
+      it "raises NoMethodError if no super method is defined" do
+        class C
+          extend Boost::Module::Toggleable
+
+          def hello = binding.boost { :hello }
+        end
+        c = C.new
+
+        expect(c.hello).to eq(:hello)
+        C.off!
+        expect { c.hello }.to raise_error(NoMethodError)
+        Object.send(:remove_const, :C)
+      end
     end
 
-    it do
+    it "return value if method defined in anonymous class" do
       klass = Class.new do
         extend Boost::Module::Toggleable
 
-        def hello
-          binding.boost do |_dep|
-            :hello
-          end
-        end
+        def hello = binding.boost { |_dep| :hello }
       end
 
       c = klass.new

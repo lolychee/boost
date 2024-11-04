@@ -2,11 +2,8 @@
 
 RSpec.describe Boost::Module::Customizable do
   describe "when extended by a Module" do
-    subject do |mod = described_class|
-      Module.new do
-        extend Boost::Module::Configurable
-        extend mod
-      end
+    subject(:mod) do |m = described_class|
+      Module.new { extend m, Boost::Module::Configurable }
     end
 
     it { is_expected.to respond_to(:initialize_customize) }
@@ -15,8 +12,8 @@ RSpec.describe Boost::Module::Customizable do
 
     describe "#initialize_copy" do
       it "copies the configuration" do
-        subject.configure(foo: :bar)
-        clone = subject.clone
+        mod.configure(foo: :bar)
+        clone = mod.clone
         subclone = clone.clone
         clone.configure(foo: :baz)
         expect(clone.config[:foo]).to eq(:baz)
@@ -24,24 +21,21 @@ RSpec.describe Boost::Module::Customizable do
       end
 
       it "set the original" do
-        subject.configure(foo: :bar)
-        clone = subject.clone
+        clone = mod.clone
         subclone = clone.clone
-        expect(clone.original).to eq(subject)
-        expect(subclone.original).to eq(subject)
+        expect(clone.original).to eq(mod)
+        expect(subclone.original).to eq(mod)
       end
 
       it "sets the temporary name" do
-        subject.configure(foo: :bar)
-        clone = subject.clone
-        expect(clone.name).to eq("#{subject.name}[**customize**]")
+        expect(mod.clone.name).to eq("#{mod.name}[**customize**]")
       end
     end
 
     describe "#initialize_customize" do
       it "configures the clone" do
-        subject.configure(foo: :bar)
-        clone = subject.clone
+        mod.configure(foo: :bar)
+        clone = mod.clone
         clone.initialize_customize(baz: :qux)
 
         expect(clone.config[:foo]).to eq(:bar)
@@ -51,11 +45,8 @@ RSpec.describe Boost::Module::Customizable do
   end
 
   describe "when extended by a Class" do
-    subject do |mod = described_class|
-      Class.new do
-        extend Boost::Module::Configurable
-        extend mod
-      end
+    subject(:klass) do |m = described_class|
+      Class.new { extend m, Boost::Module::Configurable }
     end
 
     it { is_expected.to respond_to(:initialize_customize) }
@@ -64,8 +55,8 @@ RSpec.describe Boost::Module::Customizable do
 
     describe "#initialize_copy" do
       it "copies the configuration" do
-        subject.configure(foo: :bar)
-        clone = subject.clone
+        klass.configure(foo: :bar)
+        clone = klass.clone
         subclone = clone.clone
         clone.configure(foo: :baz)
         expect(clone.config[:foo]).to eq(:baz)
@@ -73,17 +64,14 @@ RSpec.describe Boost::Module::Customizable do
       end
 
       it "set the original" do
-        subject.configure(foo: :bar)
-        clone = subject.clone
+        clone = klass.clone
         subclone = clone.clone
-        expect(clone.original).to eq(subject)
-        expect(subclone.original).to eq(subject)
+        expect(clone.original).to eq(klass)
+        expect(subclone.original).to eq(klass)
       end
 
       it "sets the temporary name" do
-        subject.configure(foo: :bar)
-        clone = subject.clone
-        expect(clone.name).to eq("#{subject.name}[**customize**]")
+        expect(klass.clone.name).to eq("#{klass.name}[**customize**]")
       end
     end
   end
