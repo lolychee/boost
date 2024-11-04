@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Boost do
-  it "has a version number" do
-    expect(Boost::VERSION).not_to be nil
-  end
-
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "eager loads all files" do
+    expect { Zeitwerk::Loader.eager_load_all }.not_to raise_error
   end
 end
