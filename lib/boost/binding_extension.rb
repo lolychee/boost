@@ -14,27 +14,16 @@ module Boost
 
       module Callable
         def self_or_call(&) = block_given? ? call(&) : self
-
-        def call(&block)
-          args = []
-          kwargs = {}
-          block.parameters.each do |type, name|
-            dep = resolve_dependency(name)
-            case type
-            when :req, :opt     then args <<        dep if dep != NO_DEPENDENCY
-            when :keyreq, :key  then kwargs[name] = dep if dep != NO_DEPENDENCY
-            end
-          end
-
-          yield(*args, **kwargs)
-        end
-
-        protected
-
-        NO_DEPENDENCY = Object.new
-        def resolve_dependency(...) = NO_DEPENDENCY
+        def call(&) = yield
       end
       include Callable
+
+      module DependencyInjectable
+        def dependency_injector = @dependency_injector ||= DependencyInjector.new(@binding)
+        alias dependencies dependency_injector
+        def call(&) = super { dependency_injector.block_call(&) }
+      end
+      include DependencyInjectable
     end
   end
 end
