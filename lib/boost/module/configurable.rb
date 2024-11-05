@@ -47,6 +47,17 @@ module Boost
       def self.extended(base)
         base.extend ClassHookMethods if base.is_a?(::Class)
       end
+
+      module BoostMethods
+        def call(&)
+          mod, = @nesting
+          deps[:module_config] = mod.config if mod.respond_to?(:config)
+
+          super
+        end
+      end
+
+      BindingExtension::Boost.include BoostMethods
     end
   end
 end

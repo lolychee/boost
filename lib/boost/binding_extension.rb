@@ -20,7 +20,7 @@ module Boost
 
       module DependencyInjectable
         def dependency_injector = @dependency_injector ||= DependencyInjector.new(@binding)
-        alias dependencies dependency_injector
+        alias deps dependency_injector
         def call(&) = super { dependency_injector.block_call(&) }
       end
       include DependencyInjectable
