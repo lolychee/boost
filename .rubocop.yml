@@ -13,3 +13,9 @@ Style/StringLiteralsInInterpolation:
 
 Style/CaseEquality:
   Enabled: false
+
+Style/NilComparison:
+  Enabled: false
+
+Style/ModuleFunction:
+  Enabled: false
