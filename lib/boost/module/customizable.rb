@@ -7,34 +7,15 @@ module Boost
 
       def initialize_copy(source)
         super
-        set_temporary_name("#{source.name}[**customize**]")
-
         @original ||= source
+
+        set_temporary_name("#{source.name}[**customize**]")
       end
 
-      def initialize_customize(...) end
+      def initialize_customize(...) = defined?(super) && super
 
-      def customize(...)
-        clone.tap { |customized| customized.initialize_customize(...) }
-      end
+      def customize(...) = clone.tap { |new| new.initialize_customize(...) }
       alias [] customize
-
-      module WithConfigurable
-        def initialize_copy(source)
-          super
-
-          @config = @original.config.dup
-        end
-
-        def initialize_customize(*, **, &)
-          configure(**)
-          super
-        end
-      end
-
-      def self.extended(base)
-        base.extend(WithConfigurable) if base.is_a?(Configurable)
-      end
     end
   end
 end

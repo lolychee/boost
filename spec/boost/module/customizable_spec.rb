@@ -3,7 +3,7 @@
 RSpec.describe Boost::Module::Customizable do
   describe "when extended by a Module" do
     subject(:mod) do |m = described_class|
-      Module.new { extend m, Boost::Module::Configurable }
+      Module.new { extend Boost::Module::Configurable, m }
     end
 
     it { is_expected.to respond_to(:initialize_customize) }
@@ -42,11 +42,15 @@ RSpec.describe Boost::Module::Customizable do
         expect(clone.config[:baz]).to eq(:qux)
       end
     end
+
+    # it do
+    #   binding.irb
+    # end
   end
 
   describe "when extended by a Class" do
     subject(:klass) do |m = described_class|
-      Class.new { extend m, Boost::Module::Configurable }
+      Class.new { extend Boost::Module::Configurable, m }
     end
 
     it { is_expected.to respond_to(:initialize_customize) }

@@ -8,8 +8,8 @@ module Boost
 
     class Boost
       def initialize(binding)
-        @binding = binding
-        @nesting = binding.eval("Module.nesting")
+        deps[:binding] = @binding = binding
+        deps[:current_module], = binding.eval("Module.nesting")
       end
 
       module Callable
@@ -19,9 +19,8 @@ module Boost
       include Callable
 
       module DependencyInjectable
-        def dependency_injector = @dependency_injector ||= DependencyInjector.new(@binding)
-        alias deps dependency_injector
-        def call(&) = super { dependency_injector.block_call(&) }
+        def self.included(base) = base.include(Dependencies)
+        def call(&block) = super { deps.call(block) }
       end
       include DependencyInjectable
     end

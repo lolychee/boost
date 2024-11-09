@@ -22,8 +22,8 @@ module Boost
           end.to_h
         end
 
-        def returns!(type)
-          @returns_type = required(type)
+        def return!(type)
+          @return_type = required(type)
         end
 
         def call(&)
@@ -31,7 +31,7 @@ module Boost
 
           check_arguments!
           check_keywords!
-          check_returns!(yield)
+          check_return!(yield)
         end
 
         protected
@@ -50,8 +50,8 @@ module Boost
           end
         end
 
-        def check_returns!(value)
-          return value if !defined?(@returns_type) || @returns_type === value
+        def check_return!(value)
+          return value if !defined?(@return_type) || @return_type === value
 
           raise TypeError, "Type Error: return value is not match #{type.inspect}"
         end
@@ -68,22 +68,22 @@ module Boost
 
       module BoostMethods
         def receives(*, **, &)
-          signature.receives!(*, **)
+          sig.receives!(*, **)
           self_or_call(&)
         end
 
-        def returns(*, **, &)
-          signature.returns!(*, **)
+        def return(*, **, &)
+          sig.return!(*, **)
           self_or_call(&)
         end
 
         def call(&)
-          defined?(@signature) ? @signature.call { super(&) } : super
+          defined?(@sig) ? @sig.call { super(&) } : super
         end
 
         protected
 
-        def signature = @signature ||= Signature.new(@binding)
+        def sig = @sig ||= Signature.new(deps[:binding])
       end
 
       BindingExtension::Boost.include BoostMethods

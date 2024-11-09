@@ -10,19 +10,17 @@ module Boost
 
       module BoostMethods
         def call(&)
-          mod, = @nesting
+          mod = deps[:current_module]
           if mod.nil?
             # boost.logger.warn "method defined in anonymous module or class, skipping"
             return super
-          elsif !mod.singleton_class.include?(Toggleable) || mod.on?
+          elsif !(mod.singleton_class < Toggleable) || mod.on?
             return super
           end
 
           @binding.eval <<~RUBY
             return super if defined?(super)
-            e = NoMethodError.new("undefined method `\#{__callee__}' for \#{self.inspect}")
-            e.set_backtrace(caller[3..-1])
-            raise(e)
+            raise NoMethodError, "undefined method `\#{__callee__}' for \#{self.inspect}", caller(6)
           RUBY
         end
       end
