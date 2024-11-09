@@ -12,7 +12,7 @@ module Boost
         set_temporary_name("#{source.name}[**customize**]")
       end
 
-      def initialize_customize(...) = defined?(super) && super
+      def initialize_customize(...) end
 
       def customize(...) = clone.tap { |new| new.initialize_customize(...) }
       alias [] customize

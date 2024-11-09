@@ -83,7 +83,7 @@ module Boost
 
         protected
 
-        def sig = @sig ||= Signature.new(deps[:binding])
+        def sig = @sig ||= Signature.new(@binding)
       end
 
       BindingExtension::Boost.include BoostMethods
