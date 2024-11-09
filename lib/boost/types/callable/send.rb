@@ -4,35 +4,23 @@ module Boost
   module Types
     module Callable
       module Send
-        include Module::Customizable
-        extend self
+        def self.[](method_name, *args, **kwargs, &block)
+          return method_name if method_name.is_a?(::Proc) || method_name.is_a?(::Method)
 
-        def call(object)
-          if @kwargs
-            object.send(@method_name, *@args, **@kwargs, &@block)
-          else
-            object.send(@method_name, *@args, &@block)
-          end
-        rescue ArgumentError => e
-          raise unless /wrong number of arguments \(given \d+, expected (?<expected>\d+)\)/ =~ e.message
+          lambda do |object|
+            object.send(method_name, *args, **kwargs, &block)
+          rescue ArgumentError => e
+            raise unless /wrong number of arguments \(given \d+, expected (?<expected>\d+)\)/ =~ e.message
+            raise unless (args.size - expected.to_i).positive?
 
-          expected = expected.to_i
-          args = @args.dup
-          block = args.size > expected && args.last.is_a?(Proc) ? args.pop : @block
-          kwargs = args.size > expected && args.last.is_a?(Hash) ? args.pop : @kwargs
+            rest = args[expected...]
+            args = args[...expected]
 
-          if kwargs
+            block   = rest.pop if rest.last.is_a?(Proc)
+            kwargs  = rest.pop if rest.last.is_a?(Hash)
+
             object.send(@method_name, *args, **kwargs, &block)
-          else
-            object.send(@method_name, *args, &block)
           end
-        end
-
-        def initialize_customize(method_name, *args, **kwargs, &block)
-          @method_name = method_name
-          @args = args
-          @kwargs = kwargs if kwargs.any?
-          @block = block if block
         end
       end
     end

@@ -11,7 +11,7 @@ module Boost
 
         def initialize_customize(return_type, send = nil, &block)
           @return_type = Operators::Is[return_type]
-          @send = block || (send.is_a?(Send) ? send : Send[send])
+          @send = block || Send[send]
         end
       end
     end
