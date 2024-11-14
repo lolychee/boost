@@ -5,27 +5,17 @@ module Boost
     module Configurable
       class Configurations < Hash
         def respond_to_missing?(name, include_private = false)
-          key = (name.end_with?("=") ? name[...-1] : name).to_sym
-          key?(key) || super
+          key?((name.end_with?("=") ? name[...-1] : name).to_sym) || super
         end
 
         def method_missing(name, *args, &)
           if name.end_with?("=")
             key = name[...-1].to_sym
-            value = self.[]=(key, *args)
-            # self.class.class_eval <<~RUBY, __FILE__, __LINE__ + 1
-            #   def #{name}(value)
-            #     self[#{key.inspect}] = value
-            #   end
-            # RUBY
+            self.[]=(key, *args).tap { define_singleton_method(name) { |v| self[key] = v } }
           else
             key = name.to_sym
-            value = self[key]
-            # self.class.class_eval <<~RUBY, __FILE__, __LINE__ + 1
-            #   def #{name} = self[#{key.inspect}]
-            # RUBY
+            self[key].tap { define_singleton_method(name) { self[key] } }
           end
-          value
         end
       end
 
@@ -34,19 +24,15 @@ module Boost
 
       def initialize_copy(source)
         super
-        @config =
-          if defined?(@original)
-            @original.config.dup
-          else
-            Configurations.new { |_h, k| source.config[k] }
-          end
+        @config = defined?(@original) ? @original.config.dup : Configurations.new { |_h, k| source.config[k] }
       end
 
       def initialize_customize(*, **, &)
+        super
         configure(**)
       end
 
-      module ClassHookMethods
+      module Inheritable
         def inherited(subclass)
           super
           subclass.instance_variable_set(:@config, Configurations.new { |_h, k| config[k] })
@@ -54,7 +40,7 @@ module Boost
       end
 
       def self.extended(base)
-        base.extend ClassHookMethods if base.is_a?(::Class)
+        base.extend Inheritable if base.is_a?(::Class)
       end
     end
   end

@@ -4,27 +4,23 @@ module Boost
   module Method
     module Signaturable
       class Signature
-        def initialize(binding)
+        def initialize(binding, *types, **kwtypes, &)
           @binding = binding
           @runtime_check = true
-        end
 
-        def runtime_check? = @runtime_check
-
-        def receives!(*types, **kwtypes)
           @types = types.map { |type| required(type) }
-          @kwtypes = kwtypes.map do |name, type|
-            if name[-1] == "?"
-              [name[0..-2].to_sym, optional(type)]
+          @kwtypes = kwtypes.filter_map do |name, type|
+            case name
+            when :return  then (@return  = required(type))  && next
+            when :*       then (@rest    = required(Array)) && next
+            when :**      then (@keyrest = required(Hash))  && next
             else
-              [name, required(type)]
+              name.end_with?("?") ? [name[...-1].to_sym, optional(type)] : [name, required(type)]
             end
           end.to_h
         end
 
-        def return!(type)
-          @return_type = required(type)
-        end
+        def runtime_check? = @runtime_check
 
         def call(&)
           return yield unless runtime_check?
@@ -38,26 +34,28 @@ module Boost
 
         def check_arguments!
           @types&.each_with_index do |type, i|
-            value = @binding.local_variable_get(@binding.local_variables[i])
-            raise TypeError, "Type Error: argument `#{name}` is not match #{type.inspect}" unless type === value
+            next if type === @binding.local_variable_get(@binding.local_variables[i])
+
+            raise TypeError, "Type Error: argument `#{name}` is not match #{type.inspect}"
           end
         end
 
         def check_keywords!
           @kwtypes&.each do |name, type|
-            value = @binding.local_variable_get(name)
-            raise TypeError, "Type Error: keyword `#{name}` is not match #{type.inspect}" unless type === value
+            next if type === @binding.local_variable_get(name)
+
+            raise TypeError, "Type Error: keyword `#{name}` is not match #{type.inspect}"
           end
         end
 
         def check_return!(value)
-          return value if !defined?(@return_type) || @return_type === value
+          return value if !defined?(@return) || @return === value
 
-          raise TypeError, "Type Error: return value is not match #{type.inspect}"
+          raise TypeError, "Type Error: return value is not match #{@return.inspect}"
         end
 
         def required(type) = any_of(type)
-        def optional(type) = any_of(nil, type)
+        def optional(type) = any_of(type, NilClass)
 
         def any_of(*types)
           raise ArgumentError, "requires at least one argument" if types.empty?
@@ -67,23 +65,14 @@ module Boost
       end
 
       module BoostMethods
-        def receives(*, **, &)
-          sig.receives!(*, **)
-          self_or_call(&)
-        end
-
-        def return(*, **, &)
-          sig.return!(*, **)
-          self_or_call(&)
-        end
-
         def call(&)
           defined?(@sig) ? @sig.call { super(&) } : super
         end
 
-        protected
-
-        def sig = @sig ||= Signature.new(@binding)
+        def sig(*, **, &)
+          @sig ||= Signature.new(deps[:binding], *, **)
+          self_or_call(&)
+        end
       end
 
       BindingExtension::Boost.include BoostMethods
