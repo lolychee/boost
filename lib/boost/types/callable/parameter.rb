@@ -7,7 +7,6 @@ module Boost
         include Type
 
         def ===(other) = @type === other || self == other
-        def initialize_customize(type) = @type = type
       end
     end
   end

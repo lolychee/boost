@@ -5,11 +5,10 @@ module Boost
     module Callable
       module Required
         include Parameter
+        include Primitives::Is[Primitives::Not[NilClass]]
         extend self
 
-        initialize_customize(Operators::Not[nil])
-
-        def initialize_customize(type) = super(Operators::Is[type])
+        def initialize_customize(type) = super(Primitives::Is[type])
       end
     end
   end

@@ -4,11 +4,10 @@ module Boost
   module Types
     module Callable
       include Type
+      include Primitives::Is[Respond[:call]]
       extend self
 
-      initialize_customize(Respond[:call])
-
-      def initialize_customize() end
+      def initialize_customize(...) end
     end
   end
 end

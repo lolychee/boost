@@ -2,12 +2,13 @@
 
 module Boost
   module Types
-    module Operators
+    module Primitives
       module Is
-        include Operator
+        include Primitive
         extend self
+        extend DoNotUseDirectly
 
-        def ===(other) = super && @type === other
+        # def ===(other) = super
       end
     end
   end

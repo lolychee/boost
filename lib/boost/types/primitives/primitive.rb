@@ -6,9 +6,17 @@ module Boost
       module Primitive
         include Type
 
-        def ===(other) = @type === other || self == other
+        module DoNotUseDirectly
+          def ===(...)
+            raise(TypeError, "do not use `#{name}` directly") unless defined?(@original)
 
-        def initialize_customize(type) = @type = type.is_a?(Operators::Operator) ? type : Operators::Is[type]
+            super
+          end
+        end
+
+        def ===(other) = @type === other
+
+        def initialize_customize(type) = @type = type
       end
     end
   end

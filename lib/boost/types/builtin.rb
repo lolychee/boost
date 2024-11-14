@@ -2,8 +2,7 @@
 
 module Boost
   module Types
-    module Callable
-      Block = Optional[Proc]
+    module Builtin
     end
   end
 end

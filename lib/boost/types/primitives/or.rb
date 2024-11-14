@@ -2,17 +2,18 @@
 
 module Boost
   module Types
-    module Operators
+    module Primitives
       module Or
-        include Operator
+        include Primitive
         extend self
+        extend DoNotUseDirectly
 
-        def ===(other) = super || (!defined?(@types) || @types.any? { |type| type === other })
+        def ===(other) = !defined?(@types) || @types.any? { |type| type === other }
 
         def initialize_customize(*types)
           raise ArgumentError, "At least two types are required" if types.size < 2
 
-          (@types ||= []).push(*types.map { |type| type.is_a?(Operator) ? type : Is[type] })
+          (@types ||= []).push(*types.map { |type| Type.cast(type) })
         end
       end
     end

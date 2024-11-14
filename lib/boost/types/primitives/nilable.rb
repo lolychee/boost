@@ -4,13 +4,12 @@ module Boost
   module Types
     module Primitives
       module Nilable
-        include Primitive
+        include Is
         extend self
+        extend Primitive::DoNotUseDirectly
 
         def ===(other)
-          raise TypeError, "do not use #{name} directly" unless defined?(@original)
-
-          super || nil === other
+          super || ::NilClass === other
         end
       end
     end

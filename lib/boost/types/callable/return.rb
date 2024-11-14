@@ -4,13 +4,13 @@ module Boost
   module Types
     module Callable
       module Return
-        include Module::Customizable
+        include Required
         extend self
 
-        def ===(other) = @return_type === @send.call(other)
+        def ===(other) = super(@send.call(other))
 
-        def initialize_customize(return_type, send = nil, &block)
-          @return_type = Operators::Is[return_type]
+        def initialize_customize(type, send = nil, &block)
+          super(type)
           @send = block || Send[send]
         end
       end

@@ -17,11 +17,11 @@ module Boost
             case type
             when :req     then args[i]      = Required
             when :opt     then args[i]      = Optional
-            when :rest    then kwargs[:*]   = Rest
+            when :rest    then kwargs[:*]   = Required[Array]
             when :keyreq  then kwargs[name] = Required
             when :key     then kwargs[name] = Optional
-            when :keyrest then kwargs[:**]  = Rest
-            when :block   then kwargs[:&]   = Block
+            when :keyrest then kwargs[:**]  = Required[Hash]
+            when :block   then kwargs[:&]   = Optional[Proc]
             end
           end
 

@@ -4,14 +4,12 @@ module Boost
   module Types
     module Builtin
       module String
-        include Type
+        include Primitives::Is[::String]
         extend self
-
-        initialize_customize(Operators::Is[::String])
 
         def initialize_customize(**constraints)
           type = @type
-          type = Operators::And[type, *constraints.map { |k, v| build_constraint(k, v) }] if constraints.any?
+          type = Primitives::And[type, *constraints.map { |k, v| build_constraint(k, v) }] if constraints.any?
           super(type)
         end
 
