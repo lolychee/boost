@@ -4,7 +4,7 @@ module Boost
   module Types
     module Primitives
       module Required
-        include Is[Not[NilClass]]
+        include Is[NotNil]
         extend self
       end
     end

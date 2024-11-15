@@ -3,10 +3,10 @@
 module Boost
   module Types
     module Primitives
-      module Union
-        include Or
+      module NotNil
+        include Not[nil]
         extend self
-        extend DoNotUseDirectly
+        extend CanNotCustomize
       end
     end
   end

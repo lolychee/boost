@@ -6,10 +6,10 @@ module Boost
       module Nilable
         include Is
         extend self
-        extend Primitive::DoNotUseDirectly
+        extend DoNotUseDirectly
 
         def ===(other)
-          super || ::NilClass === other
+          super || other.nil?
         end
       end
     end

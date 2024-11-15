@@ -12,18 +12,12 @@ module Boost
         define_method(const) { |*args, **kwargs, &block| Builtin.const_get(const)[*args, **kwargs, &block] }
       end
 
-      Method::Signaturable
+      def self.T(&)
+        raise ArgumentError, "no block given." unless block_given?
 
-      def self.T(&block)
-        return_type = Primitives::And[
-          Primitives::KindOf[Type],
-          Primitives::Or[
-            Primitives::InstanceOf[::Module],
-            Primitives::InstanceOf[::Class]
-          ]
-        ]
-        binding.boost.sig(block: Primitives::Required[::Proc]) do
-          new.instance_eval(&block).tap { |result| return_type === result }
+        return_type = And[KindOf[Type], Or[InstanceOf[::Module], InstanceOf[::Class]]]
+        new.instance_eval(&).tap do |result|
+          raise TypeError, "The block must return a type." unless return_type === result
         end
       end
     end

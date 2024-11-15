@@ -6,6 +6,7 @@ module Boost
       module Any
         include Primitive
         extend self
+        extend CanNotCustomize
 
         def ===(other) = true
       end

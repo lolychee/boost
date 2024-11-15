@@ -3,7 +3,7 @@
 RSpec.describe Boost::Types::Builtin::Hash do
   it { is_expected.to respond_to(:===) }
 
-  let(:key) { Boost::Types::Builtin::Key }
+  let(:key) { Boost::Types::Builtin::Hash::Key }
 
   describe "#===" do
     it { expect(described_class === {}).to eq(true) }

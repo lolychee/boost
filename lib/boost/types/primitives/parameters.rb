@@ -35,7 +35,7 @@ module Boost
           true
         end
 
-        def initialize_customize(*args, **kwargs)
+        def initialize_customize(*args, **kwargs, &)
           @args   = args    if args.any?
           @kwargs = kwargs  if kwargs.any?
         end

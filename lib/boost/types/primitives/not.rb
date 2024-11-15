@@ -8,7 +8,7 @@ module Boost
         extend self
         extend DoNotUseDirectly
 
-        def ===(other) = super || !(@type === other)
+        def ===(other) = !(@type === other)
       end
     end
   end

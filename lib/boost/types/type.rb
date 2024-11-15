@@ -21,6 +21,8 @@ module Boost
         end
       end
 
+      def to_proc = ->(this, other) { this === other || this == other }.curry(self)
+
       def self.cast(type)
         if type.is_a?(Primitives::Primitive)
           type

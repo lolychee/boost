@@ -4,8 +4,9 @@ module Boost
   module Types
     module Primitives
       module Return
-        include Required
+        include Primitive
         extend self
+        extend DoNotUseDirectly
 
         def ===(other) = super(@send.call(other)).tap { |result| @on_match&.call(result) }
 

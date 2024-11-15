@@ -14,6 +14,12 @@ module Boost
           end
         end
 
+        module CanNotCustomize
+          def [](...)
+            raise TypeError, "can not customize `#{name}`"
+          end
+        end
+
         def ===(other) = @type === other
 
         def initialize_customize(type) = @type = type
