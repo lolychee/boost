@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Boost::Types::Callable::Send do
+RSpec.describe Boost::Types::Primitives::Send do
   it { is_expected.to respond_to(:===) }
 
   describe "#===" do

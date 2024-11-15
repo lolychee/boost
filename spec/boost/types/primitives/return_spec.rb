@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe Boost::Types::Callable::Return do
-  let(:required) { Boost::Types::Callable::Required }
-  let(:send) { Boost::Types::Callable::Send }
+RSpec.describe Boost::Types::Primitives::Return do
+  let(:required) { Boost::Types::Primitives::Required }
+  let(:send) { Boost::Types::Primitives::Send }
 
   it { is_expected.to respond_to(:===) }
 

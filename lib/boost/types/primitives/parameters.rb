@@ -2,7 +2,7 @@
 
 module Boost
   module Types
-    module Callable
+    module Primitives
       module Parameters
         include Type
         extend self
@@ -26,10 +26,10 @@ module Boost
           end
 
           return false if defined?(@args) && !@args.each_with_index.all? do |type, i|
-            (i < args.size) && type === args[i]
+            (i < args.size) && (type === args[i] || type == args[i])
           end
           return false if defined?(@kwargs) && !@kwargs.each_pair.all? do |name, type|
-            kwargs.key?(name) && type === kwargs[name]
+            kwargs.key?(name) && (type === kwargs[name] || type == kwargs[name])
           end
 
           true

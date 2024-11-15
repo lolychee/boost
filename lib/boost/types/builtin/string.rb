@@ -8,9 +8,7 @@ module Boost
         extend self
 
         def initialize_customize(**constraints)
-          type = @type
-          type = Primitives::And[type, *constraints.map { |k, v| build_constraint(k, v) }] if constraints.any?
-          super(type)
+          super(constraints.any? ? Primitives::And[@type, *constraints.map { |k, v| build_constraint(k, v) }] : @type)
         end
 
         private
@@ -49,8 +47,8 @@ module Boost
 
         def build_constraint(key, value)
           case key
-          when *ZERO_PARAMS_METHODS then Callable::Return[value, key]
-          when *BOOLEAN_METHODS     then Callable::Return[true, Callable::Send[key, *Array(value)]]
+          when *ZERO_PARAMS_METHODS then Primitives::Return[value, key]
+          when *BOOLEAN_METHODS     then Primitives::Return[true, Primitives::Send[key, *Array(value)]]
           else raise ArgumentError, "Unknown constraint: #{key}"
           end
         end

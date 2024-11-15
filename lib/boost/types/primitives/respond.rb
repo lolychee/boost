@@ -2,9 +2,9 @@
 
 module Boost
   module Types
-    module Callable
+    module Primitives
       module Respond
-        include Module::Customizable
+        include Type
         extend self
 
         def ===(other)

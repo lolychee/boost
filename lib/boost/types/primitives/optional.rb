@@ -2,10 +2,9 @@
 
 module Boost
   module Types
-    module Callable
+    module Primitives
       module Optional
-        include Parameter
-        include Primitives::Nilable[Primitives::Any]
+        include Nilable[Any]
         extend self
       end
     end

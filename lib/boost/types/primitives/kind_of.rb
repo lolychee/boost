@@ -8,7 +8,7 @@ module Boost
         extend self
         extend DoNotUseDirectly
 
-        def ===(other) = other.kind_of?(@type) || super # rubocop:disable Style/ClassCheck
+        def ===(other) = other.kind_of?(@type) # rubocop:disable Style/ClassCheck
       end
     end
   end

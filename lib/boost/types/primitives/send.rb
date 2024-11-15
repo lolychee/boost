@@ -2,7 +2,7 @@
 
 module Boost
   module Types
-    module Callable
+    module Primitives
       module Send
         Lambda = lambda do |method_name, args, kwargs, block, object|
           object.send(method_name, *args, **kwargs, &block)
@@ -20,7 +20,7 @@ module Boost
         end
 
         def self.[](method_name, *args, **kwargs, &block)
-          return method_name if method_name.is_a?(::Proc) || method_name.is_a?(::Method)
+          return method_name.to_proc if args.empty? && kwargs.empty? && block.nil? && method_name.respond_to?(:to_proc)
 
           Lambda.curry[method_name, args, kwargs, block]
         end

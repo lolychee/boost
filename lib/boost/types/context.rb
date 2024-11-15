@@ -4,10 +4,9 @@ module Boost
   module Types
     class Context < ::Object
       include Primitives
-      include Callable
       include Builtin
 
-      # define Type() method instead of using the Type constant
+      # define Type(...) method instead of using the Type[...]
       # ref: https://bugs.ruby-lang.org/issues/19269
       Builtin.constants.each do |const|
         define_method(const) { |*args, **kwargs, &block| Builtin.const_get(const)[*args, **kwargs, &block] }
@@ -17,14 +16,14 @@ module Boost
 
       def self.T(&block)
         return_type = Primitives::And[
-          Primitives::Not[NilClass],
+          Primitives::KindOf[Type],
           Primitives::Or[
             Primitives::InstanceOf[::Module],
             Primitives::InstanceOf[::Class]
           ]
         ]
-        binding.boost.sig(block: Callable::Required[::Proc], return: return_type) do
-          new.instance_eval(&block)
+        binding.boost.sig(block: Primitives::Required[::Proc]) do
+          new.instance_eval(&block).tap { |result| return_type === result }
         end
       end
     end

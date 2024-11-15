@@ -4,12 +4,8 @@ module Boost
   module Types
     module Builtin
       module Array
-        include Enumerable::Is[::Array]
+        include Enumerable::Abstract[::Array]
         extend self
-
-        # def ===(other)
-        #   binding.irb
-        # end
 
         private
 
@@ -30,8 +26,8 @@ module Boost
 
         def build_constraint(key, value)
           case key
-          when *ZERO_PARAMS_METHODS then Callable::Return[value, key]
-          when *BOOLEAN_METHODS     then Callable::Return[true, Callable::Send[key, *Array(value)]]
+          when *ZERO_PARAMS_METHODS then Primitives::Return[value, key]
+          when *BOOLEAN_METHODS     then Primitives::Return[true, Primitives::Send[key, *Array(value)]]
           else super
           end
         end

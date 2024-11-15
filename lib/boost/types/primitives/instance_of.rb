@@ -8,7 +8,7 @@ module Boost
         extend self
         extend DoNotUseDirectly
 
-        def ===(other) = super && other.instance_of?(@type)
+        def ===(other) = other.instance_of?(@type)
       end
     end
   end

@@ -4,7 +4,7 @@ module Boost
   module Types
     module Builtin
       module Hash
-        include Enumerable::Is[::Hash]
+        include Enumerable::Abstract[::Hash]
         extend self
 
         private
@@ -30,8 +30,8 @@ module Boost
 
         def build_constraint(key, value)
           case key
-          when *ZERO_PARAMS_METHODS then Callable::Return[value, key]
-          when *BOOLEAN_METHODS     then Callable::Return[true, Callable::Send[key, *Array(value)]]
+          when *ZERO_PARAMS_METHODS then Primitives::Return[value, key]
+          when *BOOLEAN_METHODS     then Primitives::Return[true, Primitives::Send[key, *Array(value)]]
           else super
           end
         end
