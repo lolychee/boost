@@ -11,17 +11,17 @@ RSpec.describe Boost::Dependencies do
     context "when Proc" do
       let(:hello) { :world }
 
-      let(:block) { ->(foo, baz, cat:, hello:) { [foo, baz, cat, hello] } }
+      let(:block) { ->(cat:, hello:) { [cat, hello] } }
 
       it "injects dependencies" do
-        expect(deps.call(block)).to eq(%i[bar qux dog world])
+        expect(deps.call(block)).to eq(%i[dog world])
       end
     end
 
     context "when Method" do
       let(:klass) do
         Class.new do
-          def run(foo, baz, cat:, hello:) = [foo, baz, cat, hello]
+          def run(cat:, hello:) = [cat, hello]
 
           def hello = :world
         end
@@ -30,7 +30,7 @@ RSpec.describe Boost::Dependencies do
       let(:method) { klass.new.method(:run) }
 
       it "injects dependencies" do
-        expect(deps.call(method)).to eq(%i[bar qux dog world])
+        expect(deps.call(method)).to eq(%i[dog world])
       end
     end
   end
