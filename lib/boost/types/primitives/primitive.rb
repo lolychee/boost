@@ -8,7 +8,7 @@ module Boost
 
         module DoNotUseDirectly
           def ===(...)
-            raise(TypeError, "do not use `#{name}` directly") unless defined?(@original)
+            raise(TypeError, "do not use `#{name}` directly") unless defined?(@__original__)
 
             super
           end

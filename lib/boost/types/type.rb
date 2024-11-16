@@ -7,12 +7,12 @@ module Boost
 
       def ==(other)
         if other.is_a?(Type)
-          if original && other.original
-            original == other.original
-          elsif original
-            original == other
-          elsif other.original
-            self == other.original
+          if __original__ && other.__original__
+            __original__ == other.__original__
+          elsif __original__
+            __original__ == other
+          elsif other.__original__
+            self == other.__original__
           else
             true
           end
