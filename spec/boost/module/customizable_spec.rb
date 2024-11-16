@@ -11,11 +11,11 @@ RSpec.describe Boost::Module::Customizable do
     it { is_expected.to respond_to(:[]) }
 
     describe "#initialize_copy" do
-      it "sets the original" do
+      it "sets the __original__" do
         clone = mod.clone
         subclone = clone.clone
-        expect(clone.original).to eq(mod)
-        expect(subclone.original).to eq(mod)
+        expect(clone.__original__).to eq(mod)
+        expect(subclone.__original__).to eq(mod)
       end
 
       it "extends the Includable module" do
@@ -29,7 +29,7 @@ RSpec.describe Boost::Module::Customizable do
 
     describe "#customize" do
       it "leaves the name empty" do
-        expect(mod[].name).to eq(nil)
+        expect(mod[foo: :bar].name).to eq(nil)
       end
 
       it "sets the temporary name" do
@@ -52,17 +52,17 @@ RSpec.describe Boost::Module::Customizable do
     it { is_expected.to respond_to(:[]) }
 
     describe "#initialize_copy" do
-      it "sets the original" do
+      it "sets the __original__" do
         clone = klass.clone
         subclone = clone.clone
-        expect(clone.original).to eq(klass)
-        expect(subclone.original).to eq(klass)
+        expect(clone.__original__).to eq(klass)
+        expect(subclone.__original__).to eq(klass)
       end
     end
 
     describe "#customize" do
       it "leaves the name empty" do
-        expect(klass[].name).to eq(nil)
+        expect(klass[foo: :bar].name).to eq(nil)
       end
 
       it "sets the temporary name" do

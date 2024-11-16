@@ -3,44 +3,42 @@
 module Boost
   module Module
     module Customizable
-      attr_reader :original
+      attr_reader :__original__
 
       def initialize_copy(source)
         super
-        @original = source.original || source
+
+        @__original__ ||= source
         extend Includable unless is_a?(::Class)
       end
 
-      def initialize_customize(...) end
+      def initialize_customize(*args, **kwargs, &block)
+        raise ArgumentError, "At least one argument is required" if args.empty? && kwargs.empty? && block.nil?
 
-      def set_customized_name(*args, **kwargs, &block)
-        return unless original&.name
+        @__customized__ = true
+        return unless __original__&.name
 
-        signature = [
+        arguments = [
           args.any?   ? args.inspect[1..-2]   : nil,
           kwargs.any? ? kwargs.inspect[1..-2] : nil,
           block       ? :& : nil
         ].compact.join(", ")
-        set_temporary_name("#{original.name}[#{signature}]")
+
+        set_temporary_name("#{__original__.name}[#{arguments}]")
       end
 
       module Includable
-        EXCEPT_VARIABLES = %i[@original].freeze
         def included(base)
           super(base)
-          (instance_variables - EXCEPT_VARIABLES).each do |name|
+          instance_variables.each do |name|
+            next if name.start_with?("@__") && name.end_with?("__")
+
             base.instance_variable_set(name, instance_variable_get(name))
           end
         end
       end
 
-      def customize(*args, **kwargs, &block)
-        clone.tap do |new|
-          new.set_customized_name(*args, **kwargs, &block)
-          new.initialize_customize(*args, **kwargs, &block)
-        end
-      end
-
+      def customize(...) = clone.tap { |new| new.initialize_customize(...) }
       alias [] customize
     end
   end

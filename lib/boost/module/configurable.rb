@@ -24,7 +24,7 @@ module Boost
 
       def initialize_copy(source)
         super
-        @config = defined?(@original) ? @original.config.dup : Configurations.new { |_h, k| source.config[k] }
+        @config = defined?(@__original__) ? @__original__.config.dup : Configurations.new { |_h, k| source.config[k] }
       end
 
       def initialize_customize(*, **, &)
