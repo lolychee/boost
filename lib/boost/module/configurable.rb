@@ -11,10 +11,10 @@ module Boost
         def method_missing(name, *args, &)
           if name.end_with?("=")
             key = name[...-1].to_sym
-            self.[]=(key, *args).tap { define_singleton_method(name) { |v| self[key] = v } }
+            self.[]=(key, *args) # .tap { define_singleton_method(name) { |v| self[key] = v } }
           else
             key = name.to_sym
-            self[key].tap { define_singleton_method(name) { self[key] } }
+            self[key] # .tap { define_singleton_method(name) { self[key] } }
           end
         end
       end

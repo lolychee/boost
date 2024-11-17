@@ -18,6 +18,4 @@ module Boost
     end
   end
   loader.setup
-
-  ::Binding.include(BindingExtension)
 end

@@ -15,7 +15,6 @@ module Boost
       def initialize_customize(*args, **kwargs, &block)
         raise ArgumentError, "At least one argument is required" if args.empty? && kwargs.empty? && block.nil?
 
-        @__customized__ = true
         return unless __original__&.name
 
         arguments = [
