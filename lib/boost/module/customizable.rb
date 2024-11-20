@@ -3,7 +3,39 @@
 module Boost
   module Module
     module Customizable
-      attr_reader :__original__
+      class Arguments
+        def initialize(...)
+          apply!(...)
+        end
+
+        def apply(...) = clone.tap { |new| new.apply!(...) }
+
+        def apply!(*args, **kwargs, &block)
+          defined?(@args)   ? args.each_with_index { |arg, i| @args[i] = arg }  : (@args = args)
+          defined?(@kwargs) ? kwargs.each { |key, value| @kwargs[key] = value } : (@kwargs = kwargs)
+          @block = block if block_given?
+        end
+
+        def any? = @args&.any? || @kwargs&.any? || !@block
+        def empty? = !any?
+
+        def inspect
+          [
+            @args.any?   ? @args.inspect[1..-2]   : nil,
+            @kwargs.any? ? @kwargs.inspect[1..-2] : nil,
+            @block       ? :& : nil
+          ].compact.join(", ")
+        end
+
+        def [](key)
+          case key
+          when Integer, Range then @args[key]
+          else @kwargs[key]
+          end
+        end
+      end
+
+      attr_reader :__original__, :customizations
 
       def initialize_copy(source)
         super
@@ -12,18 +44,14 @@ module Boost
         extend Includable unless is_a?(::Class)
       end
 
-      def initialize_customize(*args, **kwargs, &block)
-        raise ArgumentError, "At least one argument is required" if args.empty? && kwargs.empty? && block.nil?
+      def initialize_customize(...)
+        @customizations = defined?(@customizations) ? @customizations.apply(...) : Arguments.new(...)
+
+        raise ArgumentError, "At least one argument is required" if @customizations.empty?
 
         return unless __original__&.name
 
-        arguments = [
-          args.any?   ? args.inspect[1..-2]   : nil,
-          kwargs.any? ? kwargs.inspect[1..-2] : nil,
-          block       ? :& : nil
-        ].compact.join(", ")
-
-        set_temporary_name("#{__original__.name}[#{arguments}]")
+        set_temporary_name("#{__original__.name}[#{@customizations.inspect}]")
       end
 
       module Includable

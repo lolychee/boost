@@ -16,7 +16,7 @@ module Boost
 
     def each(...) = @cached.each(...)
 
-    def [](name) = @cached[name] || resolve_dependency(name)
+    def [](name) = @cached[name]
 
     def []=(name, dependency)
       @deps[name] = dependency.tap { @cached.delete(name) }
@@ -24,35 +24,33 @@ module Boost
 
     def call(block, *, **, &)
       case block
-      when ::Method then @receiver = block.receiver
-      when ::Proc   then @receiver = block.binding.receiver
+      when ::Method then receiver = block.receiver
+      when ::Proc   then receiver = block.binding.receiver
       else raise ArgumentError, "block must be a Proc or Method"
       end
 
-      block.call(*, **, **resolve_dependencies(block), &)
-    ensure
-      @receiver = nil
+      block.call(*, **, **resolve_dependencies(receiver, block), &)
     end
 
     private
 
-    def resolve_dependencies(block)
+    def resolve_dependencies(receiver, block)
       block.parameters.filter_map do |type, name|
         next unless key?(name)
 
         case type
-        when :keyreq, :key then [name, resolve_dependency(name)]
+        when :keyreq, :key then [name, resolve_dependency(receiver, name)]
         end
       end.to_h
     end
 
-    def resolve_dependency(name)
+    def resolve_dependency(receiver, name)
       @cached[name] ||=
         if (block = @deps[name]).is_a?(::Proc)
-          kwdeps = resolve_dependencies(block)
+          kwdeps = resolve_dependencies(receiver, block)
           case block.arity
           when 0 then block.call(**kwdeps)
-          else return block.call(@receiver, **kwdeps)
+          else return block.call(receiver, **kwdeps)
           end
         else
           block

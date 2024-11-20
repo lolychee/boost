@@ -1,34 +1,27 @@
 # frozen_string_literal: true
 
 module Boost
-  module Method
+  class Method
     module Toggleable
-      include Customizable
-
-      def enable_method(method_name)
-        method = customized_methods[method_name] || return
-        method.enable!
-        method.setup!(self)
+      def enable!
+        @disabled = false
+        setup!(force: true)
+        self
       end
 
-      def disable_method(method_name)
-        method = customized_methods[method_name] || return
-        method.disable!
-        method.setup!(self)
+      def enabled? = !@disabled
+
+      def disable!
+        @disabled = true
+        setup!(force: true)
+        self
       end
 
-      module CustomizedMethodExtension
-        def enable! = @disabled = false
-        def enabled? = !@disabled
-        def disable! = @disabled = true
-        def disabled? = @disabled
+      def disabled? = @disabled
 
-        def setup!(mod)
-          enabled? ? super : mod.remove_method(name)
-        end
+      def setup!(...)
+        enabled? ? super : owner.remove_method(name)
       end
-
-      Customizable::CustomizedMethod.include CustomizedMethodExtension
     end
   end
 end
