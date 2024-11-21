@@ -12,12 +12,13 @@ module Boost
         define_method(const) { |*args, **kwargs, &block| Builtin.const_get(const)[*args, **kwargs, &block] }
       end
 
+      RETURN_TYPE = And[KindOf[Type], Or[InstanceOf[::Module], InstanceOf[::Class]]]
+
       def self.T(&)
         raise ArgumentError, "no block given." unless block_given?
 
-        return_type = And[KindOf[Type], Or[InstanceOf[::Module], InstanceOf[::Class]]]
         new.instance_eval(&).tap do |result|
-          raise TypeError, "The block must return a type." unless return_type === result
+          raise TypeError, "The block must return a type." unless RETURN_TYPE === result
         end
       end
     end
