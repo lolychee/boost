@@ -5,7 +5,7 @@ module Boost
     module Toggleable
       def enable!
         @disabled = false
-        setup!(force: true)
+        setup!
         self
       end
 
@@ -13,14 +13,14 @@ module Boost
 
       def disable!
         @disabled = true
-        setup!(force: true)
+        setup!
         self
       end
 
       def disabled? = @disabled
 
       def setup!(...)
-        enabled? ? super : owner.remove_method(name)
+        enabled? ? super : (owner.method_defined?(name) && owner.remove_method(name))
       end
     end
   end

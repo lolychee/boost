@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Boost::Method do
-  subject(:mod) { |m = described_class| Module.new { extend m::Marcos } }
+  subject(:mod) { |m = described_class| Module.new }
 
   it "creates a Boost::Method for the method" do
     mod.class_eval { def foo; end }

@@ -7,45 +7,25 @@ module Boost
     module Base
       extend Forwardable
 
-      def_delegators :@original_method, :arity, :parameters, :source_location, :bind_call
+      def_delegators :@original_method, :owner, :name, :arity, :parameters, :source_location, :bind, :bind_call
 
-      def initialize(owner, name = nil)
-        @owner = owner
-        @name = name
+      def initialize(original_method = nil)
+        @original_method = original_method
       end
 
-      attr_writer :owner, :name
-
-      def owner = @original_method&.owner || @owner
-      def name  = @original_method&.name  || @name
-
-      def original_method=(method)
-        @original_method ||= method
-      end
+      attr_writer :original_method
 
       def inspect
-        @original_method.inspect.sub(@original_method.class.name, self.class.name)
+        @original_method.nil? ? super : @original_method.inspect.sub(@original_method.class.name, self.class.name)
       end
 
       def to_proc
         this = self
-        proc do |*args, **kwargs, &block|
-          this.bind_call(self, *args, **kwargs, &block)
-        end
+        ->(*args, **kwargs, &block) { this.bind(self).call(*args, **kwargs, &block) }
       end
 
-      def setup!(force: !@skip_setup, &block)
-        return unless force
-
-        if block_given?
-          raise ArgumentError, "name should be set" unless name
-
-          owner.define_method(name, &block)
-          self.original_method = owner.instance_method(name)
-        end
+      def setup!
         owner.define_method(name, &to_proc)
-      ensure
-        @skip_setup = true
       end
     end
   end

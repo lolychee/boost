@@ -3,7 +3,7 @@
 module Boost
   class Method
     include Base
-    include Curryable
+    include Decoratable
     include Toggleable
   end
 end
