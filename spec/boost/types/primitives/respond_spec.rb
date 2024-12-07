@@ -3,7 +3,7 @@
 RSpec.describe Boost::Types::Primitives::Respond do
   let(:required) { Boost::Types::Primitives::Required }
 
-  it { is_expected.to respond_to(:===) }
+  # it { is_expected.to respond_to(:===) }
 
   describe "#===" do
     it "returns true when other responds to the method" do

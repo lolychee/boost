@@ -3,12 +3,21 @@
 module Boost
   module Types
     module Builtin
-      module String
-        include Primitives::Is[::String]
-        extend self
+      class String
+        include Type
+        include Primitives
+        extend Logical
 
-        def initialize_customize(**constraints)
-          super(constraints.any? ? Primitives::And[@type, *constraints.map { |k, v| build_constraint(k, v) }] : @type)
+        class << self
+          def ===(other)
+            ::String === other
+          end
+        end
+
+        def initialize(**constraints)
+          type = Is.new(self.class)
+          type &= constraints.map { |k, v| build_constraint(k, v) }.inject(:&) if constraints.any?
+          super(type)
         end
 
         private
@@ -47,8 +56,8 @@ module Boost
 
         def build_constraint(key, value)
           case key
-          when *ZERO_PARAMS_METHODS then Primitives::Return[value, key]
-          when *BOOLEAN_METHODS     then Primitives::Return[true, Primitives::Send[key, *Array(value)]]
+          when *ZERO_PARAMS_METHODS then Send[key].returns(value)
+          when *BOOLEAN_METHODS     then Send[key, *Array(value)].returns(true)
           else raise ArgumentError, "Unknown constraint: #{key}"
           end
         end

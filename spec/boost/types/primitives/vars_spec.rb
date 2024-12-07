@@ -19,17 +19,17 @@ RSpec.describe Boost::Types::Primitives::Vars do
     $b = nil
 
     expect(described_class[
-      a: String,
-      b: nil,
-      d: String,
-      e: nil,
-      :@a => String,
-      :@b => nil,
-      :@@a => String,
-      :@@b => nil,
-      :$a => String,
-      :$b => nil,
-      ] === binding).to eq(true)
+     a: String,
+     b: nil,
+     d: String,
+     e: nil,
+     :@a => String,
+     :@b => nil,
+     :@@a => String,
+     :@@b => nil,
+     :$a => String,
+     :$b => nil,
+     ] === binding).to eq(true)
   end
 
   it do

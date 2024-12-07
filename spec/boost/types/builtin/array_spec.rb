@@ -1,4 +1,6 @@
 RSpec.describe Boost::Types::Builtin::Array do
+  let(:key) { described_class::Index }
+
   it { is_expected.to respond_to(:===) }
 
   describe "#===" do

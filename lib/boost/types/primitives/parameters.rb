@@ -3,9 +3,13 @@
 module Boost
   module Types
     module Primitives
-      module Parameters
+      class Parameters
         include Type
-        extend self
+
+        def initialize(*args, **kwargs, &)
+          @args   = args    if args.any?
+          @kwargs = kwargs  if kwargs.any?
+        end
 
         def ===(other)
           return true unless defined?(@args) || defined?(@kwargs)
@@ -33,11 +37,6 @@ module Boost
           end
 
           true
-        end
-
-        def initialize_customize(*args, **kwargs, &)
-          @args   = args    if args.any?
-          @kwargs = kwargs  if kwargs.any?
         end
       end
     end

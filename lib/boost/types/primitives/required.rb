@@ -3,9 +3,23 @@
 module Boost
   module Types
     module Primitives
-      module Required
-        include Is[NotNil]
-        extend self
+      class Required
+        include Type
+        extend Logical
+
+        class << self
+          def ===(other)
+            !other.nil?
+          end
+        end
+
+        def initialize(type = Any)
+          super
+        end
+
+        def ===(other)
+          self.class === other && super
+        end
       end
     end
   end

@@ -4,11 +4,15 @@ module Boost
   module Types
     module Primitives
       module Any
-        include Primitive
-        extend self
-        extend CanNotCustomize
+        extend Type
 
-        def ===(other) = true
+        def self.===(_other)
+          true
+        end
+
+        def self.==(_other)
+          true
+        end
       end
     end
   end

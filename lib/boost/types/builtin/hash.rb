@@ -3,19 +3,14 @@
 module Boost
   module Types
     module Builtin
-      module Hash
-        include Enumerable::Abstract[::Hash]
-        extend self
+      class Hash < Enumerable
+        def self.===(other)
+          ::Hash === other
+        end
+
+        Key = ->(key) { Send[:[], key] }
 
         private
-
-        ZERO_PARAMS_METHODS = %i[
-          length
-          size
-          count
-          empty?
-          any?
-        ].freeze
 
         BOOLEAN_METHODS = %i[
           include?
@@ -30,8 +25,7 @@ module Boost
 
         def build_constraint(key, value)
           case key
-          when *ZERO_PARAMS_METHODS then Primitives::Return[value, key]
-          when *BOOLEAN_METHODS     then Primitives::Return[true, Primitives::Send[key, *Array(value)]]
+          when *BOOLEAN_METHODS then Send[key, *Array(value)].returns(true)
           else super
           end
         end

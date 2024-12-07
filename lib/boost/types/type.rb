@@ -3,29 +3,38 @@
 module Boost
   module Types
     module Type
-      include Module::Customizable
+      include Logical
 
-      def ==(other)
-        if other.is_a?(Type)
-          if __original__
-            __original__ == (other.__original__ || other)
-          else
-            super(other.__original__ || other)
-          end
-        else
-          super
+      module ClassMethods
+        def [](...)
+          new(...)
         end
       end
 
-      def to_proc = ->(this, other) { this === other || this == other }.curry(self)
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
+
+      def initialize(type)
+        @type = type
+      end
+
+      def ===(other)
+        @type === other
+      end
+
+      def ==(other)
+        self.class == other.class && @type == other.instance_variable_get(:@type)
+      end
 
       def self.cast(type)
-        if type.is_a?(Primitives::Primitive)
+        case type
+        when self
           type
-        elsif type.is_a?(::Module)
-          Primitives::KindOf[type]
+        when ::Module
+          Primitives::Send[:kind_of?, type].returns(true)
         else
-          Primitives::Is[type]
+          Logical::Is.new(type)
         end
       end
     end

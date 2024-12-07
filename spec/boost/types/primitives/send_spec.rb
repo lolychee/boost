@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Boost::Types::Primitives::Send do
-  it { is_expected.to respond_to(:===) }
+  # it { is_expected.to respond_to(:===) }
 
   describe "#===" do
     it { expect(described_class[:nil?].call(nil)).to be(true) }

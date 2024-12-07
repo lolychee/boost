@@ -9,10 +9,16 @@ module Boost
       # define Type(...) method instead of using the Type[...]
       # ref: https://bugs.ruby-lang.org/issues/19269
       Builtin.constants.each do |const|
-        define_method(const) { |*args, **kwargs, &block| Builtin.const_get(const)[*args, **kwargs, &block] }
+        type = Builtin.const_get(const)
+        define_method(const) { |*args, **kwargs, &block| type[*args, **kwargs, &block] }
+        define_method("#{const}?") { |*args, **kwargs, &block| Nilable[type[*args, **kwargs, &block]] }
       end
 
-      RETURN_TYPE = And[KindOf[Type], Or[InstanceOf[::Module], InstanceOf[::Class]]]
+      RETURN_TYPE = (
+        Send[:kind_of?, Type].returns(true) |
+         (Send[:instance_of?, ::Module].returns(true) |
+          Send[:instance_of?, ::Class].returns(true))
+      ).freeze
 
       def self.T(&)
         raise ArgumentError, "no block given." unless block_given?

@@ -3,9 +3,23 @@
 module Boost
   module Types
     module Primitives
-      module Optional
-        include Nilable[Any]
-        extend self
+      class Optional
+        include Type
+        extend Logical
+
+        class << self
+          def ===(other)
+            true
+          end
+        end
+
+        def initialize(type = Any)
+          super
+        end
+
+        def ===(other)
+          other.nil? || super
+        end
       end
     end
   end

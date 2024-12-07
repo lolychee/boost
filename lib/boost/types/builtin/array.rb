@@ -3,16 +3,12 @@
 module Boost
   module Types
     module Builtin
-      module Array
-        include Enumerable::Abstract[::Array]
-        extend self
+      class Array < Enumerable
+        def self.===(other)
+          ::Array === other
+        end
 
         private
-
-        ZERO_PARAMS_METHODS = %i[
-          empty?
-          any?
-        ].freeze
 
         BOOLEAN_METHODS = %i[
           include?
@@ -26,8 +22,7 @@ module Boost
 
         def build_constraint(key, value)
           case key
-          when *ZERO_PARAMS_METHODS then Primitives::Return[value, key]
-          when *BOOLEAN_METHODS     then Primitives::Return[true, Primitives::Send[key, *Array(value)]]
+          when *BOOLEAN_METHODS then Send[key, *Array(value)].returns(true)
           else super
           end
         end

@@ -2,8 +2,8 @@
 
 module Boost
   module Types
-    module Primitives
-      module Primitive
+    module Logical
+      class Is
         include Type
 
         def initialize(type)
@@ -12,6 +12,14 @@ module Boost
 
         def ===(other)
           @type === other
+        end
+
+        def ==(other)
+          instance_of?(other.class) && @type == other.instance_variable_get(:@type)
+        end
+
+        def !@
+          Not.new(@type)
         end
       end
     end

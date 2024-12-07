@@ -3,18 +3,22 @@
 module Boost
   module Types
     module Primitives
-      module Respond
+      class Respond
         include Type
-        extend self
-        extend Primitive::DoNotUseDirectly
+
+        attr_reader :method_name, :parameters
+
+        def initialize(method_name, *args, **kwargs)
+          @method_name = method_name
+          @parameters = Parameters.new(*args, **kwargs) if args.any? || kwargs.any?
+        end
 
         def ===(other)
           other.respond_to?(@method_name) && (!defined?(@parameters) || @parameters === other.method(@method_name))
         end
 
-        def initialize_customize(method_name, *args, **kwargs)
-          @method_name = method_name
-          @parameters = Parameters[*args, **kwargs] if args.any? || kwargs.any?
+        def ==(other)
+          instance_of?(other.class) && @method_name == other.method_name && @parameters == other.parameters
         end
       end
     end

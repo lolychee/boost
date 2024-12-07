@@ -3,7 +3,7 @@
 module Boost
   module Types
     module Primitives
-      Callable = Respond[:call].freeze
+      Nil = Logical::Is[::NilClass].freeze
     end
   end
 end

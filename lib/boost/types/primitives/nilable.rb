@@ -3,13 +3,11 @@
 module Boost
   module Types
     module Primitives
-      module Nilable
-        include Is
-        extend self
-        extend DoNotUseDirectly
+      class Nilable
+        include Type
 
-        def ===(other)
-          super || other.nil?
+        def initialize(type)
+          super(Nil | type)
         end
       end
     end
