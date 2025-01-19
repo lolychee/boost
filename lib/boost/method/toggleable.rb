@@ -3,24 +3,33 @@
 module Boost
   class Method
     module Toggleable
-      def enable!
-        @disabled = false
-        setup!
-        self
+      extend Decorator
+
+      def enabled?
+        !@disabled
       end
 
-      def enabled? = !@disabled
+      def enable!
+        @disabled = false
+        refine!
+      end
+
+      def disabled?
+        @disabled
+      end
 
       def disable!
         @disabled = true
-        setup!
-        self
+        refine!
       end
 
-      def disabled? = @disabled
-
-      def setup!(...)
-        enabled? ? super : (owner.method_defined?(name) && owner.remove_method(name))
+      def refine!
+        if disabled?
+          owner.method_defined?(name) && owner.remove_method(name)
+        else
+          this = self
+          owner.define_method(name) { |*args, **kwargs, &block| this.bind_call(self, *args, **kwargs, &block) }
+        end
       end
     end
   end

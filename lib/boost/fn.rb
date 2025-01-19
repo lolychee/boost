@@ -6,23 +6,21 @@ module Boost
       base.instance_variable_set(:@boost_methods, {})
     end
 
-    def fn(*args)
-      name, = args
-      if name
-        @boost_methods[name] ||= Method.new(self, *args)
-      else
-        @defining_boost_method = Method.new(self, *args)
-      end
+    REGISTRY = {
+      curry: Method::Curry
+    }.freeze
+
+    def fn
+      @boost_method_decorator = Decorators::Chain.new(REGISTRY)
     end
 
     def method_added(name)
       super
-      return unless @defining_boost_method
+      return unless @boost_method_decorator
 
-      (@boost_methods[name] ||= @defining_boost_method).tap do |method|
-        @defining_boost_method = nil
-        method.original_method = instance_method(name)
-        method.setup!
+      (@boost_methods[name] ||= Method.new(@boost_method_decorator).decorate(instance_method(name))).tap do |method|
+        @boost_method_decorator = nil
+        method.refine!
       end
     end
   end

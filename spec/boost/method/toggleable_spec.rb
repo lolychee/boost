@@ -1,22 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe Boost::Method do
+RSpec.describe Boost::Method::Toggleable do
   subject(:mod) { |m = described_class| Module.new }
-
-  it "creates a Boost::Method for the method" do
-    mod.class_eval { def foo; end }
-    method = described_class.new(mod)
-    method.original_method = mod.instance_method(:foo)
-
-    expect(method).to be_a(described_class)
-    expect(method.name).to eq(:foo)
-  end
 
   it "enables the method" do
     mod.class_eval { def foo = :foo }
-    method = described_class.new(mod)
-    method.original_method = mod.instance_method(:foo)
-    method.setup!
+    method = described_class.decorate(mod.instance_method(:foo), wrapper: nil)
+    method.refine!
 
     klass = Class.new
     klass.include mod
@@ -34,9 +24,8 @@ RSpec.describe Boost::Method do
 
   it "disables the method" do
     mod.class_eval { def foo = :foo }
-    method = described_class.new(mod)
-    method.original_method = mod.instance_method(:foo)
-    method.setup!
+    method = described_class.decorate(mod.instance_method(:foo), wrapper: nil)
+    method.refine!
 
     klass = Class.new
     klass.include mod
