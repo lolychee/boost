@@ -1,5 +1,5 @@
 module Boost
-  module Decorators
+  module Decorator
     class Chain < ::Module
       include Decorator
 
@@ -16,6 +16,11 @@ module Boost
 
       def <<(decorator)
         @stack << decorator
+        self
+      end
+
+      def clear!
+        @stack.clear!
         self
       end
 

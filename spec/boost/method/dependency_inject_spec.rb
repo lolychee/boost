@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.describe Boost::Dependencies do
+RSpec.describe Boost::Method::DependencyInject do
   let(:deps) { described_class.new({ foo: :bar, baz: -> { baz }, cat: proc { cat }, hello: :hello.to_proc }) }
   let(:baz) { :qux }
   let(:cat) { :dog }
-
-  it { is_expected.to respond_to(:call) }
 
   describe "#call" do
     context "when Proc" do
@@ -14,7 +12,8 @@ RSpec.describe Boost::Dependencies do
       let(:block) { ->(cat:, hello:) { [cat, hello] } }
 
       it "injects dependencies" do
-        expect(deps.call(block)).to eq(%i[dog world])
+        block.extend deps
+        expect(block.call).to eq(%i[dog world])
       end
     end
 
@@ -30,7 +29,8 @@ RSpec.describe Boost::Dependencies do
       let(:method) { klass.new.method(:run) }
 
       it "injects dependencies" do
-        expect(deps.call(method)).to eq(%i[dog world])
+        method.extend deps
+        expect(method.call).to eq(%i[dog world])
       end
     end
   end

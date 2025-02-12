@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Boost::Decorators::Stack do
+RSpec.describe Boost::Decorator::Stack do
   subject(:stack) { described_class.new(initial_decorators) }
 
   let(:initial_decorators) { [] }

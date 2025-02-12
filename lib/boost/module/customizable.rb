@@ -41,28 +41,16 @@ module Boost
         super
 
         @__original__ ||= source
-        extend Includable unless is_a?(::Class)
       end
 
       def initialize_customize(...)
-        @customizations = defined?(@customizations) ? @customizations.apply(...) : Arguments.new(...)
+        @customizations = Arguments.new(...)
 
         raise ArgumentError, "At least one argument is required" if @customizations.empty?
 
         return unless __original__&.name
 
         set_temporary_name("#{__original__.name}[#{@customizations.inspect}]")
-      end
-
-      module Includable
-        def included(base)
-          super(base)
-          instance_variables.each do |name|
-            next if name.start_with?("@__") && name.end_with?("__")
-
-            base.instance_variable_set(name, instance_variable_get(name))
-          end
-        end
       end
 
       def customize(...) = clone.tap { |new| new.initialize_customize(...) }

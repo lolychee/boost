@@ -17,14 +17,6 @@ RSpec.describe Boost::Module::Customizable do
         expect(clone.__original__).to eq(mod)
         expect(subclone.__original__).to eq(mod)
       end
-
-      it "extends the Includable module" do
-        expect(mod[foo: :bar].singleton_class < described_class::Includable).to eq(true)
-
-        new_mod = Module.new { @abc = 123 }
-        new_mod.include(mod[foo: :bar])
-        expect(new_mod.instance_variable_get(:@abc)).to eq(123)
-      end
     end
 
     describe "#customize" do

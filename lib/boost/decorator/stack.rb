@@ -3,7 +3,7 @@
 require "forwardable"
 
 module Boost
-  module Decorators
+  module Decorator
     class Stack < ::Module
       include Decorator
       include Enumerable

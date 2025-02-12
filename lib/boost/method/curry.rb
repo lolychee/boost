@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Boost
-  class Method
+  module Method
     class Curry < ::Module
       include Decorator
 

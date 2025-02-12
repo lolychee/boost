@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module Boost
-  class Method
+  module Method
     module Toggleable
-      extend Decorator
-
       def enabled?
         !@disabled
       end

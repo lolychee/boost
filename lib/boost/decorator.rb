@@ -5,8 +5,10 @@ require "delegate"
 module Boost
   module Decorator
     class Wrapper < ::SimpleDelegator
-      def initialize(decorator, obj)
-        define_singleton_method(:__decorator__) { decorator }
+      attr_accessor :__decorator__
+
+      def initialize(obj = nil)
+        # @__decorator__ = decorator
         super(obj)
       end
 
@@ -24,7 +26,7 @@ module Boost
     end
 
     def decorate(obj, wrapper: Wrapper)
-      obj = wrapper.new(self, obj) unless !wrapper || obj.is_a?(wrapper)
+      obj = wrapper.new(obj) unless !wrapper || obj.is_a?(wrapper)
       if block_given?
         yield(obj)
       else

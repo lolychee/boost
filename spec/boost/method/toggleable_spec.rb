@@ -5,7 +5,8 @@ RSpec.describe Boost::Method::Toggleable do
 
   it "enables the method" do
     mod.class_eval { def foo = :foo }
-    method = described_class.decorate(mod.instance_method(:foo), wrapper: nil)
+    method = mod.instance_method(:foo)
+    method.extend(described_class)
     method.refine!
 
     klass = Class.new
@@ -24,7 +25,8 @@ RSpec.describe Boost::Method::Toggleable do
 
   it "disables the method" do
     mod.class_eval { def foo = :foo }
-    method = described_class.decorate(mod.instance_method(:foo), wrapper: nil)
+    method = mod.instance_method(:foo)
+    method.extend(described_class)
     method.refine!
 
     klass = Class.new
