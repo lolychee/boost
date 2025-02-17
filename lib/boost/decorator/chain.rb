@@ -10,12 +10,16 @@ module Boost
 
       def decorate(obj, ...)
         super do
-          @stack.decorate(obj, ...)
+          @stack.reverse.decorate(obj, ...)
         end
       end
 
-      def <<(decorator)
-        @stack << decorator
+      def <<(decorator = nil, &block)
+        @stack << if block_given?
+                    Block.new(&block)
+                  else
+                    decorator
+                  end
         self
       end
 

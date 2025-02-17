@@ -29,5 +29,26 @@ RSpec.describe Boost::Marcos do
 
       expect(klass.new.foo(4, 5, kd: 14, ke: 15)).to eq([1, 2, 3, 4, 5, 11, 12, 13, 14, 15])
     end
+
+    it "applies decorators in the order they are defined" do
+      mod.class_eval do
+        extend Boost::Marcos::Fn
+
+        fn
+          .<< { |block| ["outer decorator start", *block.call, "outer decorator end"] }
+          .<< { |block| ["inner decorator start", *block.call, "inner decorator end"] }
+        def foo
+          ["original method"]
+        end
+      end
+
+      expect(klass.new.foo).to eq([
+                                    "outer decorator start",
+                                    "inner decorator start",
+                                    "original method",
+                                    "inner decorator end",
+                                    "outer decorator end"
+                                  ])
+    end
   end
 end
