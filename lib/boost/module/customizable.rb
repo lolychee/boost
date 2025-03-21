@@ -3,58 +3,45 @@
 module Boost
   module Module
     module Customizable
-      class Arguments
-        def initialize(...)
-          apply!(...)
-        end
-
-        def apply(...) = clone.tap { |new| new.apply!(...) }
-
-        def apply!(*args, **kwargs, &block)
-          defined?(@args)   ? args.each_with_index { |arg, i| @args[i] = arg }  : (@args = args)
-          defined?(@kwargs) ? kwargs.each { |key, value| @kwargs[key] = value } : (@kwargs = kwargs)
-          @block = block if block_given?
-        end
-
-        def any? = @args&.any? || @kwargs&.any? || !@block
-        def empty? = !any?
-
-        def inspect
-          [
-            @args.any?   ? @args.inspect[1..-2]   : nil,
-            @kwargs.any? ? @kwargs.inspect[1..-2] : nil,
-            @block       ? :& : nil
-          ].compact.join(", ")
-        end
-
-        def [](key)
-          case key
-          when Integer, Range then @args[key]
-          else @kwargs[key]
+      class Customization < ::Module
+        module ClassMethods
+          def customized_module_for(mod)
+            modules = included_modules
+            modules.unshift(self) unless is_a?(Class)
+            modules.find { |m| m.respond_to?(:customized_for?) && m.customized_for?(mod) }
           end
         end
+
+        def class_included(base)
+          base.extend(ClassMethods)
+        end
+        alias class_prepend class_included
+
+        def initialize(mod, ...)
+          super()
+          singleton_class.prepend(ClassHooks)
+          extend(ClassMethods)
+          include(@original = mod)
+          return unless mod.instance_variable_defined?(:@_customizing_block)
+
+          extend(::Module.new do
+            private define_method(:setup!, &mod.instance_variable_get(:@_customizing_block))
+          end)
+          setup!(mod, ...)
+        end
+
+        def customized_for?(mod)
+          @original.equal?(mod)
+        end
       end
 
-      attr_reader :__original__, :customizations
-
-      def initialize_copy(source)
-        super
-
-        @__original__ ||= source
+      def customizing(&block)
+        @_customizing_block = block
       end
 
-      def initialize_customize(...)
-        @customizations = Arguments.new(...)
-
-        raise ArgumentError, "At least one argument is required" if @customizations.empty?
-
-        return unless __original__&.name
-
-        set_temporary_name("#{__original__.name}[#{@customizations.inspect}]")
+      def customize(...)
+        Customization.new(self, ...)
       end
-
-      def customize(...) = clone.tap { |new| new.initialize_customize(...) }
-      alias [] customize
     end
   end
 end
